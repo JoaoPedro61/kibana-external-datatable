@@ -1,0 +1,1 @@
+export { VisComponent } from './vis';

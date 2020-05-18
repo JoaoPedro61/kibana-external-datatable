@@ -1,11 +1,9 @@
 import { resolve } from 'path';
 
-import exampleRoute from './server/routes/example';
-
 
 
 const kbnBstTblPluginInitializer = ({ Plugin }) => new Plugin({
-  require: ['kibana', 'elasticsearch', 'visualizations', 'interpreter', 'data'],
+  require: ['kibana', 'elasticsearch'],
   name: 'kbn_bst_tbl',
   publicDir: resolve(__dirname, 'public'),
   uiExports: {
@@ -15,7 +13,9 @@ const kbnBstTblPluginInitializer = ({ Plugin }) => new Plugin({
     hacks: [
       resolve(__dirname, 'public/legacy')
     ],
-    injectDefaultVars: server => ({})
+    injectDefaultVars: server => {
+      return {};
+    }
   },
 
   config(Joi) {
@@ -27,7 +27,6 @@ const kbnBstTblPluginInitializer = ({ Plugin }) => new Plugin({
   // eslint-disable-next-line no-unused-vars
   init(server, options) {
     // Add server routes and initialize the plugin here
-    exampleRoute(server);
   },
 });
 
