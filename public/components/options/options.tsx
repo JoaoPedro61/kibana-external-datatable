@@ -23,7 +23,8 @@ import {
   EuiAccordion,
   EuiButtonIcon,
   EuiFormControlLayoutDelimited,
-  EuiCodeEditor
+  EuiCodeEditor,
+  EuiSelect
 } from '@elastic/eui';
 
 import { requestErrors } from '../../requests-error';
@@ -34,12 +35,29 @@ import { take } from 'rxjs/operators';
 
 export function OptionsComponent({ setValue, setValidity, stateParams }) {
 
-
-  const { columns, uriTarget, showHeader, allowSortAndOrder, usePagination, defaultFilters } = stateParams;
+  const {
+    columns,
+    uriTarget,
+    allowSortAndOrder,
+    usePagination,
+    defaultFilters,
+    sendKeySortDirection,
+    sendKeySortField,
+    sendKeyOffset,
+    sendKeyPageSize,
+  } = stateParams;
 
   let _localUnparsed = JSON.stringify(defaultFilters, null, 2);
 
   const [ isUriTargetValid, setValidityUriTarget ] = useState<boolean>(true);
+
+  const [ isSendKeySortDirValid, setValiditySendKeySortDir ] = useState<boolean>(true);
+
+  const [ isSendKeySortFieldValid, setValiditySendKeySortField ] = useState<boolean>(true);
+
+  const [ isSendKeyOffsetValid, setValiditySendKeyOffset ] = useState<boolean>(true);
+
+  const [ isSendKeyPageSizeValid, setValiditySendKeyPageSize ] = useState<boolean>(true);
 
   const [ isVisibleResponse, setVisibleResponse] = useState<boolean>(false);
 
@@ -50,12 +68,12 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
   const [ responsePreviewError, setResponsePreviewError ] = useState<string>('noErros');
 
   function _setValue(target: string, value: any): void {
+    console.log(target, value);
     setValue(target, value);
   }
 
   function _checkValidity(target: string, value: any, invalidStateChanger?: (value: any) => void): boolean {
     let valid = true;
-    _setValue(target, value);
     if (target === 'uriTarget') {
       if (value && (`string` === typeof value && value.length)) {
         value = value.trim();
@@ -66,7 +84,47 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
             valid = false;
           }
         }
+      } else {
+        valid = false;
       }
+    } else if (target === 'columns') {
+      if (!Array.isArray(value)) {
+        valid = false;
+      } else if (!value.length) {
+        valid = false;
+      }
+    } else if (target === 'sendKeySortDirection') {
+      if (value && (`string` === typeof value && value.length)) {
+        value = value.trim();
+      } else {
+        valid = false;
+      }
+    } else if (target === 'sendKeySortField') {
+      if (value && (`string` === typeof value && value.length)) {
+        value = value.trim();
+      } else {
+        valid = false;
+      }
+    } else if (target === 'sendKeyOffset') {
+      if (value && (`string` === typeof value && value.length)) {
+        value = value.trim();
+      } else {
+        valid = false;
+      }
+    } else if (target === 'sendKeyPageSize') {
+      if (value && (`string` === typeof value && value.length)) {
+        value = value.trim();
+      } else {
+        valid = false;
+      }
+    } else {
+      setVisibleResponse(false);
+    }
+    if (invalidStateChanger) {
+      invalidStateChanger(valid);
+    }
+    _setValue(target, value);
+    if (target === 'uriTarget') { 
       if (valid) {
         if (isVisibleResponse) {
           _loadResponse();
@@ -76,17 +134,6 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
           setVisibleResponse(false);
         }
       }
-    } else if (target === 'columns') {
-      if (!Array.isArray(value)) {
-        valid = false;
-      } else if (!value.length) {
-        valid = false;
-      }
-    } else {
-      setVisibleResponse(false);
-    }
-    if (invalidStateChanger) {
-      invalidStateChanger(valid);
     }
     return valid;
   }
@@ -193,21 +240,25 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
       _columns = [...columns];
     }
     _columns.push({
-      target: 'response_prop',
-      label: 'Header Label',
+      target: 'change_me',
+      label: 'Change Me',
       key: '_' + Math.random().toString(36).substr(2, 9),
       validColumnTarget: true,
-      validColumnLabel: true
+      validColumnLabel: true,
+      sortable: true,
+      hideOnMobile: false,
+      truncateText: true,
+      alignment: 'left',
     });
     _checkValidity('columns', _columns);
   }
 
   function _removeColumn(item: any, index: number): void {
-    let _columns = columns || [];
-    if (_columns.length) {
-      if (_columns[index]) {
-        let _n_columns = columns.splice(index, 1);
-        _checkValidity('columns', _n_columns);
+    console.log(columns);
+    if (columns.length) {
+      if (columns[index]) {
+        columns.splice(index, 1);
+        _checkValidity('columns', columns);
       }
     }
   }
@@ -254,36 +305,111 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
 
       const designed = (
         <Fragment key={item.key}>
-          <EuiFlexGroup alignItems="flexEnd" justifyContent="spaceBetween" gutterSize="s">
-            <EuiFlexItem>
+          <EuiPanel paddingSize="s">
+            <EuiFlexGroup alignItems="flexEnd" justifyContent="spaceBetween" gutterSize="s">
+              <EuiFlexItem>
+                <EuiSpacer size="s" />
+                <EuiFormLabel>Key / Label</EuiFormLabel>
+                <EuiFormControlLayoutDelimited
+                  compressed={true}
+                  fullWidth
+                  startControl={
+                    <input
+                      type="text"
+                      className="euiFieldText"
+                      name="target"
+                      value={item.target}
+                      placeholder="your_prop"
+                      onChange={e => _updateColumn(item, index, 'target', e.target.value)}
+                    />
+                  }
+                  endControl={
+                    <input
+                      type="text"
+                      className="euiFieldText"
+                      name="label"
+                      value={item.label}
+                      placeholder="Header label"
+                      onChange={e => _updateColumn(item, index, 'label', e.target.value)}
+                    />
+                  }
+                />
+              </EuiFlexItem>
+              {buttonFrag}
+            </EuiFlexGroup>
+            <EuiSpacer size="s" />
+            <EuiAccordion id={`mode_options_${index}`} buttonContent={(
+                <>
+                  <EuiText size="xs">
+                    More options
+                  </EuiText>
+                </>
+              )}>
               <EuiSpacer size="s" />
-              <EuiFormLabel>Key / Label</EuiFormLabel>
-              <EuiFormControlLayoutDelimited
-                compressed={true}
-                startControl={
-                  <input
-                    type="text"
-                    className="euiFieldText"
-                    name="target"
-                    value={item.target}
-                    placeholder="your_prop"
-                    onChange={e => _updateColumn(item, index, 'target', e.target.value)}
-                  />
-                }
-                endControl={
-                  <input
-                    type="text"
-                    className="euiFieldText"
-                    name="label"
-                    value={item.label}
-                    placeholder="Header label"
-                    onChange={e => _updateColumn(item, index, 'label', e.target.value)}
-                  />
-                }
-              />
-            </EuiFlexItem>
-            {buttonFrag}
-          </EuiFlexGroup>
+              <EuiFormRow
+                fullWidth={true}
+                display="rowCompressed">
+                <EuiSwitch
+                  label="Sortable"
+                  checked={!!item.sortable}
+                  name="item.sortable"
+                  compressed={true}
+                  onChange={e => _updateColumn(item, index, 'sortable', e.target.checked)}
+                />
+              </EuiFormRow>
+              <EuiSpacer size="s" />
+              <EuiFormRow
+                fullWidth={true}
+                display="rowCompressed">
+                <EuiSwitch
+                  label="Ellipsis text"
+                  checked={!!item.truncateText}
+                  name="item.truncateText"
+                  compressed={true}
+                  onChange={e => _updateColumn(item, index, 'truncateText', e.target.checked)}
+                />
+              </EuiFormRow>
+              <EuiSpacer size="s" />
+              <EuiFormRow
+                fullWidth={true}
+                display="rowCompressed">
+                <EuiSwitch
+                  label="Hide on mobile"
+                  checked={!!item.hideOnMobile}
+                  name="item.hideOnMobile"
+                  compressed={true}
+                  onChange={e => _updateColumn(item, index, 'hideOnMobile', e.target.checked)}
+                />
+              </EuiFormRow>
+              <EuiSpacer size="s" />
+              <EuiFormLabel>Alignment</EuiFormLabel>
+              <EuiFormRow
+                fullWidth={true}
+                display="rowCompressed">
+                <EuiSelect
+                  fullWidth
+                  options={[
+                    {
+                      value: 'left',
+                      text: 'Left',
+                    },
+                    {
+                      value: 'center',
+                      text: 'Center',
+                    },
+                    {
+                      value: 'right',
+                      text: 'Right',
+                    }
+                  ]}
+                  value={item.alignment}
+                  compressed={true}
+                  onChange={(e) => _updateColumn(item, index, 'alignment', e.target.value)}
+                />
+              </EuiFormRow>
+            </EuiAccordion>
+          </EuiPanel>
+          <EuiSpacer size="s" />
         </Fragment>
       );
 
@@ -291,6 +417,7 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
     });
     let layout = (
       <EuiForm>
+        <EuiSpacer size="m" />
         {groups}
         <EuiSpacer size="m" />
         <EuiFlexGroup gutterSize="none" alignItems="center" justifyContent="center">
@@ -349,18 +476,6 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
               </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size="s" />
-          <EuiFormRow
-            fullWidth={true}
-            display="rowCompressed">
-            <EuiSwitch
-              label="Show header"
-              checked={showHeader}
-              name="showHeader"
-              compressed={true}
-              onChange={e => _checkValidity('showHeader', e.target.checked)}
-            />
-          </EuiFormRow>
           <EuiSpacer size="m" />
           <EuiFormRow
             fullWidth={true}
@@ -388,6 +503,79 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
           <EuiSpacer size="m" />
           <EuiAccordion id="columns" buttonContent="Columns">
             {_columns()}
+          </EuiAccordion>
+          <EuiSpacer size="s" />
+          <EuiAccordion id="advanced" buttonContent="Advanced">
+            <EuiForm>
+              <EuiSpacer size="s" />
+              <EuiFormRow
+                label="Sort direction"
+                helpText={`Ex.: ${uriTarget}?${sendKeySortDirection}=asc`}
+                fullWidth={true}
+                isInvalid={!isSendKeySortDirValid}
+                display="rowCompressed">
+                
+                <EuiFieldText
+                  name="sendKeySortDirection"
+                  isInvalid={!isSendKeySortDirValid}
+                  compressed={true}
+                  value={sendKeySortDirection}
+                  placeholder="_sort"
+                  onChange={e => _checkValidity('sendKeySortDirection', e.target.value, setValiditySendKeySortDir)}
+                />
+              </EuiFormRow>
+              <EuiSpacer size="s" />
+              <EuiFormRow
+                label="Sort field"
+                helpText={`Ex.: ${uriTarget}?${sendKeySortField}=id`}
+                fullWidth={true}
+                isInvalid={!isSendKeySortFieldValid}
+                display="rowCompressed">
+                
+                <EuiFieldText
+                  name="sendKeySortField"
+                  isInvalid={!isSendKeySortFieldValid}
+                  compressed={true}
+                  value={sendKeySortField}
+                  placeholder="_order"
+                  onChange={e => _checkValidity('sendKeySortField', e.target.value, setValiditySendKeySortField)}
+                />
+              </EuiFormRow>
+              <EuiSpacer size="s" />
+              <EuiFormRow
+                label="Page size (limit)"
+                helpText={`Ex.: ${uriTarget}?${sendKeyPageSize}=15`}
+                fullWidth={true}
+                isInvalid={!isSendKeyPageSizeValid}
+                display="rowCompressed">
+                
+                <EuiFieldText
+                  name="sendKeyPageSize"
+                  isInvalid={!isSendKeyPageSizeValid}
+                  compressed={true}
+                  value={sendKeyPageSize}
+                  placeholder="_limit"
+                  onChange={e => _checkValidity('sendKeyPageSize', e.target.value, setValiditySendKeyPageSize)}
+                />
+              </EuiFormRow>
+              <EuiSpacer size="s" />
+              <EuiFormRow
+                label="Offset"
+                helpText={`Ex.: ${uriTarget}?${sendKeyOffset}=15`}
+                fullWidth={true}
+                isInvalid={!isSendKeyOffsetValid}
+                display="rowCompressed">
+                
+                <EuiFieldText
+                  name="sendKeyOffset"
+                  isInvalid={!isSendKeyOffsetValid}
+                  compressed={true}
+                  value={sendKeyOffset}
+                  placeholder="_offset"
+                  onChange={e => _checkValidity('sendKeyOffset', e.target.value, setValiditySendKeyOffset)}
+                />
+              </EuiFormRow>
+            </EuiForm>
           </EuiAccordion>
           <EuiSpacer size="m" />
           <EuiFormLabel>Default filters</EuiFormLabel>

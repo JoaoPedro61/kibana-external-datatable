@@ -9,21 +9,31 @@ export interface RenderValue<C, V = VisParams> {
 }
 
 export interface VisParamTblColumn {
+  [x: string]: any;
 	key: string;
 	target: string;
 	label: string;
+  sortable: boolean;
+  hideOnMobile: boolean;
+  truncateText: boolean;
+  alignment: string;
 }
 
 export interface VisParams {
+  [x: string]: any;
   columns: VisParamTblColumn[];
   uriTarget: string;
-  showHeader: boolean;
   usePagination: boolean;
   allowSortAndOrder: boolean;
-
-  page: number;
   pageSize: number;
+  pageSizes: number[];
   defaultFilters: Partial<any>;
+  sortDirection: string;
+  sortField: string;
+  sendKeySortDirection: string;
+  sendKeySortField: string;
+  sendKeyOffset: string;
+  sendKeyPageSize: string;
 }
 
 export interface TblVisPluginSetupDependencies {
