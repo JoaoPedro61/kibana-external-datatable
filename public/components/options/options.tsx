@@ -30,6 +30,7 @@ import {
 import { requestErrors } from '../../requests-error';
 import { get } from './../../api';
 import { take } from 'rxjs/operators';
+import { equals } from '../../equals';
 
 
 
@@ -49,6 +50,8 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
 
   let _localUnparsed = JSON.stringify(defaultFilters, null, 2);
 
+  const [ unbindedDefaultFilters, setUnbindedDefaultFilters ] = useState<any>(JSON.parse(JSON.stringify(defaultFilters)));
+
   const [ isUriTargetValid, setValidityUriTarget ] = useState<boolean>(true);
 
   const [ isSendKeySortDirValid, setValiditySendKeySortDir ] = useState<boolean>(true);
@@ -59,11 +62,11 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
 
   const [ isSendKeyPageSizeValid, setValiditySendKeyPageSize ] = useState<boolean>(true);
 
-  const [ isVisibleResponse, setVisibleResponse] = useState<boolean>(false);
+  const [ isVisibleResponse, setVisibleResponse ] = useState<boolean>(false);
 
-  const [ isLoadingResponse, setLoadingResponse] = useState<boolean>(true);
+  const [ isLoadingResponse, setLoadingResponse ] = useState<boolean>(true);
 
-  const [ responsePreview, setResponsePreview] = useState<any>({});
+  const [ responsePreview, setResponsePreview ] = useState<any>({});
 
   const [ responsePreviewError, setResponsePreviewError ] = useState<string>('noErros');
 
@@ -254,11 +257,11 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
   }
 
   function _removeColumn(item: any, index: number): void {
-    console.log(columns);
-    if (columns.length) {
-      if (columns[index]) {
-        columns.splice(index, 1);
-        _checkValidity('columns', columns);
+    const _columns = [...columns];
+    if (_columns.length) {
+      if (_columns[index]) {
+        _columns.splice(index, 1);
+        _checkValidity('columns', _columns);
       }
     }
   }
@@ -277,7 +280,7 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
               columns[index].validColumnTarget = true;
             }
           }
-          _checkValidity('columns', columns);
+          _checkValidity('columns', [...columns]);
         }
       }
     }
@@ -318,9 +321,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
                       type="text"
                       className="euiFieldText"
                       name="target"
-                      value={item.target}
+                      defaultValue={item.target}
                       placeholder="your_prop"
-                      onChange={e => _updateColumn(item, index, 'target', e.target.value)}
+                      onBlur={e => _updateColumn(item, index, 'target', e.target.value)}
                     />
                   }
                   endControl={
@@ -328,9 +331,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
                       type="text"
                       className="euiFieldText"
                       name="label"
-                      value={item.label}
+                      defaultValue={item.label}
                       placeholder="Header label"
-                      onChange={e => _updateColumn(item, index, 'label', e.target.value)}
+                      onBlur={e => _updateColumn(item, index, 'label', e.target.value)}
                     />
                   }
                 />
@@ -443,7 +446,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
     } else {
       try {
         const parsed = JSON.parse(_localUnparsed);
-      _setValue('defaultFilters', parsed);
+        if (!equals(parsed, defaultFilters)) {
+          _setValue('defaultFilters', parsed);
+        }
       } catch (e) {}
     }
   }
