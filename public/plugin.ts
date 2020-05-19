@@ -17,7 +17,7 @@ export class TblVisPlugin implements Plugin<void, void> {
     { data, visualizations, expressions }: TblVisPluginSetupDependencies
   ) {
     expressions.registerFunction(createVisFn);
-    visualizations.types.createReactVisualization(createTypeDefinition(arguments));
+    visualizations.createReactVisualization(createTypeDefinition(arguments));
   }
 
   public start(core: CoreStart) {

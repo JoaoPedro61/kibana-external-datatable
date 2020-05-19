@@ -1,8 +1,5 @@
-import { Status } from './imports';
-
 import { VisComponent, OptionsComponent } from './components';
 import { DEFAULT_VIS_CONFIG } from './defaults';
-
 
 
 export const createTypeDefinition = (dependencies?: any) => {
@@ -11,7 +8,7 @@ export const createTypeDefinition = (dependencies?: any) => {
     title: 'Brisanet datatable',
     icon: 'tableDensityNormal',
     description: 'Provides a basic API to assemble a table, consuming data from the Brisanet database.',
-    requiresUpdateStatus: [Status.AGGS, Status.PARAMS, Status.UI_STATE],
+    requiresUpdateStatus: ['params'],
     requiresPartialRows: true,
     visConfig: {
       component: VisComponent,

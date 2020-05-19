@@ -15,8 +15,6 @@ import { take } from 'rxjs/operators';
 
 export function VisComponent({ visData, visParams, config, vis, updateStatus }) {
 
-	console.log(updateStatus);
-
 	let oldDiffs: string[] = [];
 
 	const [firstTime, setFirstTime] = useState(true);
@@ -128,58 +126,60 @@ export function VisComponent({ visData, visParams, config, vis, updateStatus }) 
 		let execLoad = false;
 		oldDiffs = [];
 		if (!didCancel) {
-			if (updateStatus.params) {
-				if (pageSize !== visParams.pageSize) {
-					oldDiffs.push('pageSize');
-					setPageSize(visParams.pageSize);
-					execLoad = true;
-				}
-				if (usePagination !== visParams.usePagination) {
-					oldDiffs.push('usePagination');
-					setUsePagination(visParams.usePagination);
-					execLoad = true;
-				}
-				if (allowSortAndOrder !== visParams.allowSortAndOrder) {
-					oldDiffs.push('allowSortAndOrder');
-					setAllowSortAndOrder(visParams.allowSortAndOrder);
-				}
-				if (uriTarget !== visParams.uriTarget) {
-					oldDiffs.push('uriTarget');
-					setURITarget(visParams.uriTarget);
-					execLoad = true;
-				}
-				if (sortDirection !== visParams.sortDirection) {
-					oldDiffs.push('sortDirection');
-					setSortDirection(visParams.sortDirection);
-					execLoad = true;
-				}
-				if (sortField !== visParams.sortField) {
-					oldDiffs.push('sortField');
-					setSortField(visParams.sortField);
-					execLoad = true;
-				}
-				if (sendKeySortDirection !== visParams.sendKeySortDirection) {
-					oldDiffs.push('sendKeySortDirection');
-					setSendKeySortDirection(visParams.sendKeySortDirection);
-					execLoad = true;
-				}
-				if (sendKeySortField !== visParams.sendKeySortField) {
-					oldDiffs.push('sendKeySortField');
-					setSendKeySortField(visParams.sendKeySortField);
-					execLoad = true;
-				}
-				if (sendKeyOffset !== visParams.sendKeyOffset) {
-					oldDiffs.push('sendKeyOffset');
-					setSendKeyOffset(visParams.sendKeyOffset);
-					execLoad = true;
-				}
-				if (sendKeyPageSize !== visParams.sendKeyPageSize) {
-					oldDiffs.push('sendKeyPageSize');
-					setSendKeyPageSize(visParams.sendKeyPageSize);
-					execLoad = true;
-				}
-				if (execLoad) {
-					_loadDatatable();
+			if (updateStatus) {
+				if (updateStatus.params) {
+					if (pageSize !== visParams.pageSize) {
+						oldDiffs.push('pageSize');
+						setPageSize(visParams.pageSize);
+						execLoad = true;
+					}
+					if (usePagination !== visParams.usePagination) {
+						oldDiffs.push('usePagination');
+						setUsePagination(visParams.usePagination);
+						execLoad = true;
+					}
+					if (allowSortAndOrder !== visParams.allowSortAndOrder) {
+						oldDiffs.push('allowSortAndOrder');
+						setAllowSortAndOrder(visParams.allowSortAndOrder);
+					}
+					if (uriTarget !== visParams.uriTarget) {
+						oldDiffs.push('uriTarget');
+						setURITarget(visParams.uriTarget);
+						execLoad = true;
+					}
+					if (sortDirection !== visParams.sortDirection) {
+						oldDiffs.push('sortDirection');
+						setSortDirection(visParams.sortDirection);
+						execLoad = true;
+					}
+					if (sortField !== visParams.sortField) {
+						oldDiffs.push('sortField');
+						setSortField(visParams.sortField);
+						execLoad = true;
+					}
+					if (sendKeySortDirection !== visParams.sendKeySortDirection) {
+						oldDiffs.push('sendKeySortDirection');
+						setSendKeySortDirection(visParams.sendKeySortDirection);
+						execLoad = true;
+					}
+					if (sendKeySortField !== visParams.sendKeySortField) {
+						oldDiffs.push('sendKeySortField');
+						setSendKeySortField(visParams.sendKeySortField);
+						execLoad = true;
+					}
+					if (sendKeyOffset !== visParams.sendKeyOffset) {
+						oldDiffs.push('sendKeyOffset');
+						setSendKeyOffset(visParams.sendKeyOffset);
+						execLoad = true;
+					}
+					if (sendKeyPageSize !== visParams.sendKeyPageSize) {
+						oldDiffs.push('sendKeyPageSize');
+						setSendKeyPageSize(visParams.sendKeyPageSize);
+						execLoad = true;
+					}
+					if (execLoad) {
+						_loadDatatable();
+					}
 				}
 			}
 		}
@@ -276,8 +276,10 @@ export function VisComponent({ visData, visParams, config, vis, updateStatus }) 
 	useEffect(() => {
 		let didCancel = false;
 		if (!didCancel) {
-			if (updateStatus.aggs || updateStatus.uiState) {
-				setShouldReload(!shouldReload);
+			if (updateStatus) {
+				if (updateStatus.aggs || updateStatus.uiState) {
+					setShouldReload(!shouldReload);
+				}
 			}
 		}
 		return () => {
