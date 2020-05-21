@@ -1,11 +1,14 @@
 export const requestErrors = {
   unauthorized: {
     title: `Opss...`,
-    message: `Hummm, it looks like you are not allowed to make a mistake request.`
+    message: `Hummm, parece que você não tem permissão para acessar este tipo de dado.`
   },
   notFound: {
     title: `Opss...`,
-    message: `Hummm, it looks like the route you want to access doesn't exist.`
+    message: `Hummm, parece que a rota que você deseja acessar não existe.`
+  },
+  malformationDataResponse: {
+    title: `Opss...`,
+    message: `Hmmmm, parece que os dados retornados não são compatíveis com os recomendados.`
   }
 };
-

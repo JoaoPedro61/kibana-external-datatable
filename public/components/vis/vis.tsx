@@ -4,97 +4,127 @@ import {
 	EuiLoadingSpinner,
 	EuiFlexGroup,
 	EuiFlexItem,
-	EuiSpacer
+	EuiText,
+	EuiEmptyPrompt,
+	EuiTitle
 } from '@elastic/eui';
 import { VisParamTblColumn } from './../../type';
 import { merge } from './../../deep-merge';
-import { get } from '../../api';
+import { get as letItGo } from '../../api';
 import { take } from 'rxjs/operators';
+import { addQueryParams, isValid } from '../../valid-url';
+import { equals } from '../../equals';
+import { requestErrors } from '../../requests-error';
 
 
 
-export function VisComponent({ visData, visParams, config, vis, updateStatus }) {
+export function VisComponent({ visData, visParams }) {
 
-	let oldDiffs: string[] = [];
+	const [currentVisData, set_currentVisData] = useState(visData);
 
-	const [firstTime, setFirstTime] = useState(true);
+	const [timer, set_timer] = useState(null);
 
-	const [shouldReload, setShouldReload] = useState(false);
+	const [shouldIgnoreFirst, set_shouldIgnoreFirst] = useState(true);
 
-	const [pageIndex, setPageIndex] = useState(0);
+	const [isLoading, set_isLoading] = useState(isValid(visParams.uriTarget));
 
-	const [pageSize, setPageSize] = useState(visParams.pageSize);
+	const [validURI, set_validURI] = useState(isValid(visParams.uriTarget));
+	
+	const [data_error, set_data_error] = useState(`noErros`);
 
-	const [pageSizes, setPageSizes] = useState(visParams.pageSizes);
+	const [shouldReload, set_shouldReload] = useState(false);
 
-	const [usePagination, setUsePagination] = useState(visParams.usePagination);
+	const [pageIndex, set_pageIndex] = useState(0);
 
-	const [allowSortAndOrder, setAllowSortAndOrder] = useState(visParams.allowSortAndOrder);
+	const [pageSize, set_pageSize] = useState(visParams.pageSize);
+	
+	const [pageSizes, set_pageSizes] = useState(visParams.pageSizes);
 
-	const [columns, setColumns] = useState(visParams.columns);
+	const [uriTarget, set_uriTarget] = useState(visParams.uriTarget);
 
-	const [uriTarget, setURITarget] = useState(visParams.uriTarget);
+	const [usePagination, set_usePagination] = useState(visParams.usePagination);
 
-	const [defaultFilters, setDefaultFilters] = useState(visParams.defaultFilters);
+	const [allowSortAndOrder, set_allowSortAndOrder] = useState(visParams.allowSortAndOrder);
 
-	const [sendKeySortDirection, setSendKeySortDirection] = useState(visParams.sendKeySortDirection);
+	const [columns, set_columns] = useState(visParams.columns);
 
-	const [sendKeySortField, setSendKeySortField] = useState(visParams.sendKeySortField);
+	const [defaultFilters, set_defaultFilters] = useState(visParams.defaultFilters);
 
-	const [sendKeyOffset, setSendKeyOffset] = useState(visParams.sendKeyOffset);
+	const [sendKeySortDirection, set_sendKeySortDirection] = useState(visParams.sendKeySortDirection);
 
-	const [sendKeyPageSize, setSendKeyPageSize] = useState(visParams.sendKeyPageSize);
+	const [sendKeySortField, set_sendKeySortField] = useState(visParams.sendKeySortField);
 
-	const [sortField, setSortField] = useState(visParams.sortField);
+	const [sendKeyOffset, set_sendKeyOffset] = useState(visParams.sendKeyOffset);
 
-	const [sortDirection, setSortDirection] = useState(visParams.sortDirection);
+	const [sendKeyPageSize, set_sendKeyPageSize] = useState(visParams.sendKeyPageSize);
 
-	const [itemsTotal, setItemsTotal] = useState(0);
+	const [sortField, set_sortField] = useState(visParams.sortField);
 
-	const [pageOfItems, setPageOfItems] = useState([]);
+	const [sortDirection, set_sortDirection] = useState(visParams.sortDirection);
 
-	const [loading, setLoading] = useState(true);
+	const [itemsTotal, set_itemsTotal] = useState(0);
 
-	function _loadDatatable(ignoreFirstTime: boolean = false): void {
-		if (ignoreFirstTime ? false : firstTime) {
-			setFirstTime(false);
-		} else {
-			if (!loading) {
-				setLoading(true);
-			}
-			let queryString: Partial<any> = {
-				...(allowSortAndOrder ? {
-					[sendKeySortDirection]: sortDirection,
-					[sendKeySortField]: sortField
-				} : {}),
-				...(usePagination ? {
-					[sendKeyOffset]: pageIndex * pageSize,
-					[sendKeyPageSize]: pageSize,
-				} : {}),
-			};
+	const [pageOfItems, set_pageOfItems] = useState([]);
 
-			queryString = merge({...defaultFilters}, {...queryString});
-
-			get(uriTarget, queryString)
-				.pipe(take(1))
-				.subscribe((response: any) => {
-					setLoading(false);
-					if (!Array.isArray(response) && response.hasOwnProperty('data')) {
-						setPageOfItems(response.data);
-						if (response.hasOwnProperty('total')) {
-							setItemsTotal(response.total);
-						} else {
-							setItemsTotal(response.data.length);
-						}
-					} else if (Array.isArray(response)) {
-						setPageOfItems(response as any);
-						setItemsTotal(response.length);
+	function _fetchMetadata(loadFrom?: string) {
+		if (!timer) {
+			const _timer: any = setTimeout(() => {
+				if (!validURI) {
+					if (isLoading) {
+						set_isLoading(false);
 					}
-				}, () => {
-					setPageOfItems([]);
-					setItemsTotal(0);
-					setLoading(false);
-				});
+				} else {
+					if (!isLoading) {
+						set_isLoading(true);
+					}
+					let queryString: Partial<any> = {
+						...(allowSortAndOrder ? {
+							[sendKeySortDirection]: sortDirection,
+							[sendKeySortField]: sortField
+						} : {}),
+						...(usePagination ? {
+							[sendKeyOffset]: pageIndex * pageSize,
+							[sendKeyPageSize]: pageSize,
+						} : {}),
+					};
+					queryString = merge({ ...defaultFilters }, { ...queryString });
+					const uri = addQueryParams(visParams.uriTarget, { ...queryString, ...visData }, [
+						`type`,
+						`timeRange`,
+						`query`,
+						`filters`,
+						sendKeySortDirection,
+						sendKeySortField,
+						sendKeyOffset,
+						sendKeyPageSize,
+					]);
+					letItGo(uri)
+						.pipe(take(1))
+						.subscribe((response) => {
+							if (!Array.isArray(response) && response.hasOwnProperty('data')) {
+								set_pageOfItems(response.data);
+								if (response.hasOwnProperty('total')) {
+									set_itemsTotal(response.total);
+								} else {
+									set_itemsTotal(response.data.length);
+								}
+							} else if (Array.isArray(response)) {
+								set_pageOfItems(response as any);
+								set_itemsTotal(response.length);
+							} else {
+								set_data_error(`malformationDataResponse`);
+							}
+							set_isLoading(false);
+						}, (error) => {
+							set_data_error(error.statusName);
+							set_pageOfItems([]);
+							set_itemsTotal(0);
+							set_isLoading(false);
+						});
+				}
+				set_timer(null);
+			}, 300);
+			set_timer(_timer);
 		}
 	}
 
@@ -102,217 +132,232 @@ export function VisComponent({ visData, visParams, config, vis, updateStatus }) 
 		const { index, size } = page as any;
 		const { field, direction } = sort as any;
 
-		setPageIndex(index || 0);
-		setPageSize(size || pageSizes[0]);
+		set_pageIndex(index || 0);
+		set_pageSize(size || pageSizes[0]);
 
-		setSortField(field);
-		setSortDirection(direction);
+		set_sortField(field);
+		set_sortDirection(direction);
 
-		setShouldReload(!shouldReload);
+		set_shouldReload(!shouldReload);
 	}
 
 	useEffect(() => {
 		let didCancel = false;
-
-		!didCancel && _loadDatatable();
-
-		return () => {
-			didCancel = true;
-		};
-	}, [shouldReload])
-
-	useEffect((...args: any) => {
-		let didCancel = false;
-		let execLoad = false;
-		oldDiffs = [];
 		if (!didCancel) {
-			if (updateStatus) {
-				if (updateStatus.params) {
-					if (pageSize !== visParams.pageSize) {
-						oldDiffs.push('pageSize');
-						setPageSize(visParams.pageSize);
-						execLoad = true;
-					}
-					if (usePagination !== visParams.usePagination) {
-						oldDiffs.push('usePagination');
-						setUsePagination(visParams.usePagination);
-						execLoad = true;
-					}
-					if (allowSortAndOrder !== visParams.allowSortAndOrder) {
-						oldDiffs.push('allowSortAndOrder');
-						setAllowSortAndOrder(visParams.allowSortAndOrder);
-					}
-					if (uriTarget !== visParams.uriTarget) {
-						oldDiffs.push('uriTarget');
-						setURITarget(visParams.uriTarget);
-						execLoad = true;
-					}
-					if (sortDirection !== visParams.sortDirection) {
-						oldDiffs.push('sortDirection');
-						setSortDirection(visParams.sortDirection);
-						execLoad = true;
-					}
-					if (sortField !== visParams.sortField) {
-						oldDiffs.push('sortField');
-						setSortField(visParams.sortField);
-						execLoad = true;
-					}
-					if (sendKeySortDirection !== visParams.sendKeySortDirection) {
-						oldDiffs.push('sendKeySortDirection');
-						setSendKeySortDirection(visParams.sendKeySortDirection);
-						execLoad = true;
-					}
-					if (sendKeySortField !== visParams.sendKeySortField) {
-						oldDiffs.push('sendKeySortField');
-						setSendKeySortField(visParams.sendKeySortField);
-						execLoad = true;
-					}
-					if (sendKeyOffset !== visParams.sendKeyOffset) {
-						oldDiffs.push('sendKeyOffset');
-						setSendKeyOffset(visParams.sendKeyOffset);
-						execLoad = true;
-					}
-					if (sendKeyPageSize !== visParams.sendKeyPageSize) {
-						oldDiffs.push('sendKeyPageSize');
-						setSendKeyPageSize(visParams.sendKeyPageSize);
-						execLoad = true;
-					}
-					if (execLoad) {
-						_loadDatatable();
-					}
-				}
+			if (!shouldIgnoreFirst) {
+				_fetchMetadata(`shouldReload useEffect`);
 			}
 		}
 		return () => {
 			didCancel = true;
 		};
+	}, [shouldReload]);
+
+	useEffect(() => {
+		let didCancel = false;
+
+		if (!didCancel) {
+			if (!shouldIgnoreFirst) {
+				if (!equals(currentVisData, visData)) {
+					set_validURI(isValid(visParams.uriTarget));
+					set_uriTarget(visParams.uriTarget);
+					set_currentVisData(visData);
+					_fetchMetadata(`visdata useEffect`);
+				}
+			}
+		}
+
+		return () => {
+			didCancel = true;
+		}
+	}, [visData]);
+
+	useEffect(() => {
+		let didCancel = false;
+		if (!didCancel) {
+
+			let _go = false;
+
+			if (visParams.uriTarget !== uriTarget) {
+				_go = true;
+				set_validURI(isValid(visParams.uriTarget));
+				set_uriTarget(visParams.uriTarget);
+			}
+
+			if (visParams.pageSize !== pageSize) {
+				_go = true;
+				set_pageSize(visParams.pageSize);
+			}
+
+			if (visParams.usePagination !== usePagination) {
+				_go = true;
+				set_usePagination(visParams.usePagination);
+			}
+
+			if (visParams.allowSortAndOrder !== allowSortAndOrder) {
+				set_allowSortAndOrder(visParams.allowSortAndOrder);
+			}
+
+			if (visParams.sendKeySortDirection !== sendKeySortDirection) {
+				_go = true;
+				set_sendKeySortDirection(visParams.sendKeySortDirection);
+			}
+
+			if (visParams.sendKeySortField !== sendKeySortField) {
+				_go = true;
+				set_sendKeySortField(visParams.sendKeySortField);
+			}
+
+			if (visParams.sendKeyOffset !== sendKeyOffset) {
+				_go = true;
+				set_sendKeyOffset(visParams.sendKeyOffset);
+			}
+
+			if (visParams.sendKeyPageSize !== sendKeyPageSize) {
+				_go = true;
+				set_sendKeyPageSize(visParams.sendKeyPageSize);
+			}
+
+			if (visParams.sortField !== sortField) {
+				_go = true;
+				set_sortField(visParams.sortField);
+			}
+
+			if (visParams.sortDirection !== sortDirection) {
+				_go = true;
+				set_sortDirection(visParams.sortDirection);
+			}
+
+			if (!equals(visParams.columns, columns)) {
+				set_columns(visParams.columns);
+			}
+
+			if (!equals(visParams.defaultFilters, defaultFilters)) {
+				_go = true;
+				set_defaultFilters(visParams.defaultFilters);
+			}
+
+			if (!equals(visParams.pageSizes, pageSizes)) {
+				set_pageSizes(visParams.pageSizes);
+			}
+
+			if (_go) {
+				set_shouldReload(!shouldReload);
+			}
+
+		}
+		
 	}, [visParams]);
 
 	useEffect(() => {
-		let didCancel = false;
-		if (!didCancel) {
-			if (!oldDiffs.length || oldDiffs.indexOf('defaultFilters') === -1) {
-				oldDiffs.push('defaultFilters');
-			}
-			setDefaultFilters(visParams.defaultFilters);
-			_loadDatatable();
+		if (validURI) {
+			_fetchMetadata(`Initial load`);
 		}
-		return () => {
-			didCancel = true;
-		};
-	}, [visParams.defaultFilters]);
+		set_shouldIgnoreFirst(false);
+	}, [ ]);
 
-	useEffect(() => {
-		let didCancel = false;
-		if (!didCancel) {
-			if (!oldDiffs.length || oldDiffs.indexOf('pageSizes') === -1) {
-				oldDiffs.push('pageSizes');
-			}
-			setPageSizes(visParams.pageSizes);
+	let dataFragment = (<></>);
 
+	if (data_error === `noErros`) {
+		dataFragment = (
+			<EuiBasicTable
+				noItemsMessage="Não há dados"
+				items={pageOfItems}
+				columns={(columns || []).map((item: VisParamTblColumn) => {
+					return {
+						field: item.target,
+						name: item.label,
+						align: item.alignment || 'left',
+						truncateText: !!item.truncateText,
+						...(allowSortAndOrder ? {
+							sortable: item.hasOwnProperty('sortable') ? !!(item as any).sortable : true,
+						} : {}),
+						hideForMobile: !!item.hideOnMobile,
+						mobileOptions: {
+							show: !item.hideOnMobile
+						},
+					};
+				})}
+				sorting={allowSortAndOrder ? {
+					sort: {
+						field: sortField,
+						direction: sortDirection,
+					},
+					allowNeutralSort: true
+				} : undefined}
+				pagination={usePagination ? {
+					pageIndex,
+					pageSize,
+					totalItemCount: itemsTotal,
+					pageSizeOptions: pageSizes,
+					hidePerPageOptions: false,
+				} : undefined}
+				onChange={onTableChange}
+			/>
+		);
+	} else {
+		let error;
+		if (requestErrors.hasOwnProperty(data_error)) {
+			error = (requestErrors as any)[data_error];
+		} else {
+			error = {
+				title: `Opss...`,
+				message: `Desculpe, ocorreu um erro desconhecido.`
+			};
 		}
-		return () => {
-			didCancel = true;
-		};
-	}, [visParams.pageSizes]);
-
-	useEffect(() => {
-		let didCancel = false;
-		if (!didCancel) {
-			if (!oldDiffs.length || oldDiffs.indexOf('columns') === -1) {
-				oldDiffs.push('columns');
-			}
-			setColumns(visParams.columns);
-		}
-		return () => {
-			didCancel = true;
-		};
-	}, [visParams.columns]);
-
-	useEffect(() => {
-		_loadDatatable(true);
-	}, []);
-
-	const _columns: any[] = columns.map((item: VisParamTblColumn) => {
-		return {
-			field: item.target,
-			name: item.label,
-			align: item.alignment || 'left',
-			truncateText: !!item.truncateText,
-			...(allowSortAndOrder ? {
-				sortable: item.hasOwnProperty('sortable') ? !!(item as any).sortable : true,
-			} : {}),
-			hideForMobile: !!item.hideOnMobile,
-			mobileOptions: {
-				show: !item.hideOnMobile
-			},
-		};
-	});
-
-	let _pagination = undefined;
-
-	if (usePagination) {
-		_pagination = {
-			pageIndex,
-			pageSize,
-			totalItemCount: itemsTotal,
-			pageSizeOptions: pageSizes,
-			hidePerPageOptions: false,
-		};
+		dataFragment = (
+			<EuiFlexGroup alignItems="center" justifyContent="center">
+				<EuiFlexItem grow={false}>
+					<EuiEmptyPrompt
+						iconType="dataVisualizer"
+						title={
+							<EuiTitle size="s">
+								<h4>{error.title}</h4>
+							</EuiTitle>
+						}
+						titleSize="xs"
+						body={
+							<Fragment>
+								<p>{error.message}</p>
+							</Fragment>
+						}
+					/>
+				</EuiFlexItem>
+			</EuiFlexGroup>
+		);
 	}
 
-	let _sorting = undefined;
+	let mainFragment = (<></>);
 
-	if (allowSortAndOrder) {
-		_sorting = {
-			sort: {
-				field: sortField,
-				direction: sortDirection,
-			},
-			allowNeutralSort: true
-		};
-	}
-
-	useEffect(() => {
-		let didCancel = false;
-		if (!didCancel) {
-			if (updateStatus) {
-				if (updateStatus.aggs || updateStatus.uiState) {
-					setShouldReload(!shouldReload);
-				}
-			}
+	if (isLoading) {
+		mainFragment = (
+			<EuiFlexGroup alignItems="center" justifyContent="center">
+				<EuiFlexItem grow={false}>
+					<EuiLoadingSpinner
+						size="xl"
+					/>
+				</EuiFlexItem>
+			</EuiFlexGroup>
+		);
+	} else {
+		if (validURI) {
+			mainFragment = (
+				<>{dataFragment}</>
+			);
+		} else {
+			mainFragment = (
+				<EuiFlexGroup alignItems="center" justifyContent="center">
+					<EuiFlexItem grow={false}>
+						<EuiText color="subdued">A URL informada não é uma URL válida!</EuiText>
+					</EuiFlexItem>
+				</EuiFlexGroup>
+			);
 		}
-		return () => {
-			didCancel = true;
-		};
-	}, [updateStatus]);
+	}
 
 	return (
 		<Fragment>
-			{
-				loading ? (
-					<>
-						<EuiFlexGroup alignItems="center" justifyContent="center" gutterSize="none">
-							<EuiFlexItem grow={false}>
-								<EuiSpacer size="xxl" />
-								<EuiLoadingSpinner size="xl" />
-							</EuiFlexItem>
-						</EuiFlexGroup>
-					</>
-				)
-					: (
-						<>
-							<EuiBasicTable
-								noItemsMessage="Não há dados"
-								items={pageOfItems}
-								columns={_columns}
-								sorting={_sorting}
-								pagination={_pagination}
-								onChange={onTableChange}
-							/>
-						</>
-					)
-			}
+			{mainFragment}
 		</Fragment>
 	);
 }
