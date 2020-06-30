@@ -1,4 +1,4 @@
-# kbn_bst_tbl
+# kbn-bst-tbl
 
 > An awesome Kibana plugin
 
