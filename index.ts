@@ -4,11 +4,11 @@ import { resolve } from 'path';
 
 const kbnBstTblPluginInitializer = ({ Plugin }) => new Plugin({
   require: ['kibana', 'elasticsearch'],
-  name: 'kbn_bst_tbl',
+  name: 'kbn-bst-tbl',
   publicDir: resolve(__dirname, 'public'),
   uiExports: {
     visTypes: [
-      'plugins/kbn_bst_tbl/legacy'
+      'plugins/kbn-bst-tbl/legacy'
     ],
     hacks: [
       resolve(__dirname, 'public/legacy')
