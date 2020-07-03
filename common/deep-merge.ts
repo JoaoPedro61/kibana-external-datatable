@@ -1,0 +1,1 @@
+export const merge=(t: Partial<any>, s: Partial<any>)=>{const o=Object,a=o.assign;for(const k of o.keys(s))s[k]instanceof o&&a(s[k],merge(t[k],s[k]));return a(t||{},s),t}

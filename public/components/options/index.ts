@@ -1,1 +1,0 @@
-export { OptionsComponent } from './options';

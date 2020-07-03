@@ -1,0 +1,47 @@
+/*
+  npm install -g less
+
+  lessc styles.less style.css
+*/
+
+@danger: #f44336;
+@danger-color: #fff;
+
+@info: #2196f3;
+@info-color: #fff;
+
+@success: #4caf50;
+@success-color: #fff;
+
+@warning: #ff5722;
+@warning-color: #fff;
+
+each(range(60), {
+  @offset: 100 - @value;
+  @percentage: percentage(@offset / 100);
+  
+  .danger-@{offset} {
+    color: @danger-color;
+    background: fade(@danger, @percentage);
+    background-color: fade(@danger, @percentage);
+  }
+
+  .info-@{offset} {
+    color: @info-color;
+    background: fade(@info, @percentage);
+    background-color: fade(@info, @percentage);
+  }
+
+  .success-@{offset} {
+    color: @success-color;
+    background: fade(@success, @percentage);
+    background-color: fade(@success, @percentage);
+  }
+
+  .warning-@{offset} {
+    color: @warning-color;
+    background: fade(@warning, @percentage);
+    background-color: fade(@warning, @percentage);
+  }
+
+});
