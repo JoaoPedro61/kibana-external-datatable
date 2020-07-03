@@ -1,4 +1,4 @@
-(window["kbn_bst_tbl_bundle_jsonpfunction"] = window["kbn_bst_tbl_bundle_jsonpfunction"] || []).push([[0],{
+(window["kbn-bst-tbl_bundle_jsonpfunction"] = window["kbn-bst-tbl_bundle_jsonpfunction"] || []).push([[0],{
 
 /***/ "../../node_modules/css-loader/dist/cjs.js?!../../node_modules/postcss-loader/src/index.js?!../../node_modules/resolve-url-loader/index.js?!../../node_modules/sass-loader/dist/cjs.js?!../../src/plugins/vis_default_editor/public/index.scss?dark":
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\

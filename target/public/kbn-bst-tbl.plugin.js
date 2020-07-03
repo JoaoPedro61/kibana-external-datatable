@@ -1,4 +1,4 @@
-var __kbnBundles__ = typeof __kbnBundles__ === "object" ? __kbnBundles__ : {}; __kbnBundles__["plugin/kbn_bst_tbl"] =
+var __kbnBundles__ = typeof __kbnBundles__ === "object" ? __kbnBundles__ : {}; __kbnBundles__["plugin/kbn-bst-tbl"] =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// install a JSONP callback for chunk loading
 /******/ 	function webpackJsonpCallback(data) {
@@ -37,7 +37,7 @@ var __kbnBundles__ = typeof __kbnBundles__ === "object" ? __kbnBundles__ : {}; _
 /******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 	// Promise = chunk loading, 0 = chunk loaded
 /******/ 	var installedChunks = {
-/******/ 		"kbn_bst_tbl": 0
+/******/ 		"kbn-bst-tbl": 0
 /******/ 	};
 /******/
 /******/
@@ -188,7 +188,7 @@ var __kbnBundles__ = typeof __kbnBundles__ === "object" ? __kbnBundles__ : {}; _
 /******/ 	// on error function for async loading
 /******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
 /******/
-/******/ 	var jsonpArray = window["kbn_bst_tbl_bundle_jsonpfunction"] = window["kbn_bst_tbl_bundle_jsonpfunction"] || [];
+/******/ 	var jsonpArray = window["kbn-bst-tbl_bundle_jsonpfunction"] = window["kbn-bst-tbl_bundle_jsonpfunction"] || [];
 /******/ 	var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
 /******/ 	jsonpArray.push = webpackJsonpCallback;
 /******/ 	jsonpArray = jsonpArray.slice();
@@ -20310,14 +20310,14 @@ exports.easing = {
 
 /***/ }),
 
-/***/ "../../node_modules/val-loader/dist/cjs.js?key=kbn_bst_tbl!../../packages/kbn-ui-shared-deps/public_path_module_creator.js":
+/***/ "../../node_modules/val-loader/dist/cjs.js?key=kbn-bst-tbl!../../packages/kbn-ui-shared-deps/public_path_module_creator.js":
 /*!***************************************************************************************************************************************************************************************************************************!*\
-  !*** /home/pedro/Projects/src/github.com/elastic/kibana/node_modules/val-loader/dist/cjs.js?key=kbn_bst_tbl!/home/pedro/Projects/src/github.com/elastic/kibana/packages/kbn-ui-shared-deps/public_path_module_creator.js ***!
+  !*** /home/pedro/Projects/src/github.com/elastic/kibana/node_modules/val-loader/dist/cjs.js?key=kbn-bst-tbl!/home/pedro/Projects/src/github.com/elastic/kibana/packages/kbn-ui-shared-deps/public_path_module_creator.js ***!
   \***************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__.p = window.__kbnPublicPath__['kbn_bst_tbl']
+__webpack_require__.p = window.__kbnPublicPath__['kbn-bst-tbl']
 
 /***/ }),
 
@@ -29945,9 +29945,9 @@ var _tryToInt = __webpack_require__(/*! ./try-to-int */ "./common/try-to-int.ts"
  * specific language governing permissions and limitations
  * under the License.
  */
-const PLUGIN_ID = 'kbn_bst_tbl';
+const PLUGIN_ID = 'kbn-bst-tbl';
 exports.PLUGIN_ID = PLUGIN_ID;
-const PLUGIN_NAME = 'kbn_bst_tbl';
+const PLUGIN_NAME = 'kbn-bst-tbl';
 exports.PLUGIN_NAME = PLUGIN_NAME;
 
 /***/ }),
@@ -31414,7 +31414,7 @@ Object.defineProperty(exports, "KbnBstTblPluginStart", {
   }
 });
 
-__webpack_require__(/*! ../../../node_modules/val-loader/dist/cjs.js?key=kbn_bst_tbl!../../../packages/kbn-ui-shared-deps/public_path_module_creator.js */ "../../node_modules/val-loader/dist/cjs.js?key=kbn_bst_tbl!../../packages/kbn-ui-shared-deps/public_path_module_creator.js");
+__webpack_require__(/*! ../../../node_modules/val-loader/dist/cjs.js?key=kbn-bst-tbl!../../../packages/kbn-ui-shared-deps/public_path_module_creator.js */ "../../node_modules/val-loader/dist/cjs.js?key=kbn-bst-tbl!../../packages/kbn-ui-shared-deps/public_path_module_creator.js");
 
 var _plugin = __webpack_require__(/*! ./plugin */ "./public/plugin.ts");
 
@@ -31654,4 +31654,4 @@ module.exports = __kbnSharedDeps__.RxjsOperators;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=kbn_bst_tbl.plugin.js.map
+//# sourceMappingURL=kbn-bst-tbl.plugin.js.map
