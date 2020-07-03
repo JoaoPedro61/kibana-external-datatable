@@ -1,5 +1,5 @@
 {
-  "id": "kbn_bst_tbl",
+  "id": "kbn-bst-tbl",
   "version": "kibana",
   "server": true,
   "ui": true,

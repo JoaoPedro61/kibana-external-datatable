@@ -17,8 +17,8 @@
  * under the License.
  */
 
-export const PLUGIN_ID = 'kbn_bst_tbl';
-export const PLUGIN_NAME = 'kbn_bst_tbl';
+export const PLUGIN_ID = 'kbn-bst-tbl';
+export const PLUGIN_NAME = 'kbn-bst-tbl';
 
 
 
