@@ -23,7 +23,7 @@ export const PLUGIN_NAME = 'kbn-bst-tbl';
 
 
 export { get } from './api';
-export { merge } from './deep-merge';
+export { merge, mergeWithExcludes } from './deep-merge';
 export { equals } from './equals';
 export { addQueryParams, isValid } from './url';
 export { requestErrors } from './erros';

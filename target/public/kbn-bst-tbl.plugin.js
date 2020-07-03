@@ -29750,7 +29750,9 @@ function get(url, queryString = {}, options = {}) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.merge = void 0;
+exports.mergeWithExcludes = exports.merge = void 0;
+
+var _deepTypeChecker = __webpack_require__(/*! ./deep-type-checker */ "./common/deep-type-checker.ts");
 
 const merge = (t, s) => {
   const o = Object,
@@ -29762,6 +29764,101 @@ const merge = (t, s) => {
 };
 
 exports.merge = merge;
+
+const mergeWithExcludes = (target, source, skipIfTypeAre = [], exludeKeys = []) => {
+  let _source_with_out_keys = {};
+
+  if (exludeKeys.length) {
+    for (const key of Object.keys(source)) {
+      if (exludeKeys.indexOf(key) === -1) {
+        _source_with_out_keys[key] = source[key];
+      }
+    }
+  } else {
+    _source_with_out_keys = source;
+  }
+
+  let _source = {};
+
+  if (skipIfTypeAre.length) {
+    for (const key of Object.keys(_source_with_out_keys)) {
+      if (skipIfTypeAre.indexOf((0, _deepTypeChecker.deepTypechecker)(_source_with_out_keys[key])) === -1) {
+        _source[key] = _source_with_out_keys[key];
+      }
+    }
+  } else {
+    _source = _source_with_out_keys;
+  }
+
+  for (const key of Object.keys(_source)) {
+    if (_source[key] instanceof Object) {
+      debugger;
+      Object.assign(_source[key], mergeWithExcludes(target[key], _source[key], skipIfTypeAre, exludeKeys));
+    }
+  }
+
+  Object.assign(target || {}, _source);
+  return target;
+};
+
+exports.mergeWithExcludes = mergeWithExcludes;
+
+/***/ }),
+
+/***/ "./common/deep-type-checker.ts":
+/*!*************************************!*\
+  !*** ./common/deep-type-checker.ts ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.deepTypechecker = deepTypechecker;
+
+/**
+ * Avaliable returns types
+ *
+ * @export
+ * @type {DeepTypeCheckerTypes}
+ */
+
+/**
+ * Verification of type in deep
+ *
+ * @export
+ * @param {*} value Parameter to check it type
+ * @returns {DeepTypeCheckerTypes}
+ */
+function deepTypechecker(value) {
+  const type = Object.prototype.toString.call(value);
+
+  if (type === `[object Object]`) {
+    return `object`;
+  } else if (type === `[object Date]`) {
+    return `date`;
+  } else if (type === `[object Array]`) {
+    return `array`;
+  } else if (type === `[object String]`) {
+    return `string`;
+  } else if (type === `[object Boolean]`) {
+    return `boolean`;
+  } else if (type === `[object Function]`) {
+    return `function`;
+  } else if (type === `[object Number]`) {
+    return `number`;
+  } else if (type === `[object Undefined]`) {
+    return `undefined`;
+  } else if (type === `[object Null]`) {
+    return `null`;
+  } else {
+    return 'unrecognized';
+  }
+}
 
 /***/ }),
 
@@ -29881,6 +29978,12 @@ Object.defineProperty(exports, "merge", {
   enumerable: true,
   get: function () {
     return _deepMerge.merge;
+  }
+});
+Object.defineProperty(exports, "mergeWithExcludes", {
+  enumerable: true,
+  get: function () {
+    return _deepMerge.mergeWithExcludes;
   }
 });
 Object.defineProperty(exports, "equals", {
@@ -30765,6 +30868,8 @@ var _eui = __webpack_require__(/*! @elastic/eui */ "@elastic/eui");
 
 var _operators = __webpack_require__(/*! rxjs/operators */ "rxjs/operators");
 
+var _services = __webpack_require__(/*! ../../../services */ "./public/services.ts");
+
 var _common = __webpack_require__(/*! ../../../../common */ "./common/index.ts");
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
@@ -30842,20 +30947,14 @@ function Component({
                 [sendKeyPageSize]: pageSize
               } : {})
             };
+            const superData = (0, _services.getDataService)();
             queryString = (0, _common.merge)({}, { ...queryString
             });
             const uri = (0, _common.addQueryParams)(visParams.uriTarget, { ...queryString,
-              ...visData
-            }, [
-              /* `type`,
-              `timeRange`,
-              `query`,
-              `filters`,
-              sendKeySortDirection,
-              sendKeySortField,
-              sendKeyOffset,
-              sendKeyPageSize, */
-            ]);
+              ...visData,
+              timeRange: superData.query.timefilter.timefilter.getTime(),
+              filters: JSON.parse(JSON.stringify([...(superData.query.filterManager.getFilters() || [])]))
+            }, []);
             (0, _common.get)(uri).pipe((0, _operators.take)(1)).subscribe(response => {
               if (!Array.isArray(response) && response.hasOwnProperty('data')) {
                 set_data_error(`noErros`);

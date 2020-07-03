@@ -32,6 +32,8 @@ import {
 } from '@elastic/eui';
 import { take } from 'rxjs/operators';
 
+import { getDataService } from '../../../services';
+
 
 import {
 	requestErrors,
@@ -39,7 +41,8 @@ import {
 	equals,
 	isValid,
 	addQueryParams,
-	merge
+	merge,
+	mergeWithExcludes
 } from '../../../../common';
 
 
@@ -118,17 +121,13 @@ export function Component({ visData, visParams }: any) {
 								[sendKeyPageSize]: pageSize,
 							} : {}),
 						};
-						queryString = merge({ }, { ...queryString });
-						const uri = addQueryParams(visParams.uriTarget, { ...queryString, ...visData }, [
-							/* `type`,
-							`timeRange`,
-							`query`,
-							`filters`,
-							sendKeySortDirection,
-							sendKeySortField,
-							sendKeyOffset,
-							sendKeyPageSize, */
-						]);
+						const superData = getDataService();
+						queryString = merge({}, { ...queryString });
+						const uri = addQueryParams(visParams.uriTarget, {
+							...queryString,
+							...visData,
+							timeRange: superData.query.timefilter.timefilter.getTime(),
+							filters: JSON.parse(JSON.stringify([...(superData.query.filterManager.getFilters() || [])])) }, [ ]);
 						letItGo(uri)
 							.pipe(take(1))
 							.subscribe((response) => {
@@ -140,7 +139,7 @@ export function Component({ visData, visParams }: any) {
 										const items: any[] = [];
 										let offset: number = pageIndex * pageSize;
 										let lim: number = offset + pageSize;
-										for ( ; offset < lim ; offset++) {
+										for (; offset < lim; offset++) {
 											if (response.data[offset]) {
 												items.push(response.data[offset]);
 											}
@@ -162,7 +161,7 @@ export function Component({ visData, visParams }: any) {
 										const items: any[] = [];
 										let offset: number = pageIndex * pageSize;
 										let lim: number = offset + pageSize;
-										for ( ; offset < lim ; offset++) {
+										for (; offset < lim; offset++) {
 											if (response[offset]) {
 												items.push(response[offset]);
 											}
@@ -188,7 +187,7 @@ export function Component({ visData, visParams }: any) {
 							const items: any[] = [];
 							let offset: number = pageIndex * pageSize;
 							let lim: number = offset + pageSize;
-							for ( ; offset < lim ; offset++) {
+							for (; offset < lim; offset++) {
 								if (unpaginatedItems[offset]) {
 									items.push(unpaginatedItems[offset]);
 								}
