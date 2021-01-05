@@ -1,0 +1,12 @@
+{
+  "id": "kbn-bst-tbl",
+  "version": "kibana",
+  "server": true,
+  "ui": true,
+  "requiredPlugins": [
+    "expressions",
+    "visualizations",
+    "data"
+  ],
+  "optionalPlugins": []
+}
