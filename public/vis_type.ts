@@ -1,17 +1,14 @@
-import { Status } from './imports';
-
 import { VisComponent, OptionsComponent } from './components';
 import { DEFAULT_VIS_CONFIG } from './defaults';
-
 
 
 export const createTypeDefinition = (dependencies?: any) => {
   return {
     name: 'bst_tbl',
-    title: 'Brisanet datatable',
-    icon: 'tableDensityNormal',
+    title: 'Brisanet Data Table',
+    icon: 'visTable',
     description: 'Provides a basic API to assemble a table, consuming data from the Brisanet database.',
-    requiresUpdateStatus: [Status.AGGS, Status.PARAMS, Status.UI_STATE],
+    requiresUpdateStatus: [],
     requiresPartialRows: true,
     visConfig: {
       component: VisComponent,

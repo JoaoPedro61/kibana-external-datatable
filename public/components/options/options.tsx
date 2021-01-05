@@ -31,6 +31,7 @@ import { requestErrors } from '../../requests-error';
 import { get } from './../../api';
 import { take } from 'rxjs/operators';
 import { equals } from '../../equals';
+import { isValid } from '../../valid-url';
 
 
 
@@ -50,9 +51,7 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
 
   let _localUnparsed = JSON.stringify(defaultFilters, null, 2);
 
-  const [ unbindedDefaultFilters, setUnbindedDefaultFilters ] = useState<any>(JSON.parse(JSON.stringify(defaultFilters)));
-
-  const [ isUriTargetValid, setValidityUriTarget ] = useState<boolean>(true);
+  const [ isUriTargetValid, setValidityUriTarget ] = useState<boolean>(isValid(stateParams.uriTarget));
 
   const [ isSendKeySortDirValid, setValiditySendKeySortDir ] = useState<boolean>(true);
 
@@ -70,9 +69,18 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
 
   const [ responsePreviewError, setResponsePreviewError ] = useState<string>('noErros');
 
+  if (!stateParams.hasOwnProperty(`counter`)) {
+    stateParams.counter = 1;
+    setValue(`counter`, 1);
+  } else {
+    if (stateParams.counter > 1000) {
+      setValue(`counter`, 1);
+    }
+  }
+
   function _setValue(target: string, value: any): void {
-    console.log(target, value);
     setValue(target, value);
+    setValue(`counter`, stateParams.counter++);
   }
 
   function _checkValidity(target: string, value: any, invalidStateChanger?: (value: any) => void): boolean {
@@ -468,9 +476,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
               name="uriTarget"
               isInvalid={!isUriTargetValid}
               compressed={true}
-              value={uriTarget}
+              defaultValue={uriTarget}
               placeholder="https://example.com"
-              onChange={e => _checkValidity('uriTarget', e.target.value, setValidityUriTarget)}
+              onBlur={e => _checkValidity('uriTarget', e.target.value, setValidityUriTarget)}
             />
           </EuiFormRow>
           <EuiSpacer size="s" />
@@ -524,9 +532,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
                   name="sendKeySortDirection"
                   isInvalid={!isSendKeySortDirValid}
                   compressed={true}
-                  value={sendKeySortDirection}
+                  defaultValue={sendKeySortDirection}
                   placeholder="_sort"
-                  onChange={e => _checkValidity('sendKeySortDirection', e.target.value, setValiditySendKeySortDir)}
+                  onBlur={e => _checkValidity('sendKeySortDirection', e.target.value, setValiditySendKeySortDir)}
                 />
               </EuiFormRow>
               <EuiSpacer size="s" />
@@ -541,9 +549,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
                   name="sendKeySortField"
                   isInvalid={!isSendKeySortFieldValid}
                   compressed={true}
-                  value={sendKeySortField}
+                  defaultValue={sendKeySortField}
                   placeholder="_order"
-                  onChange={e => _checkValidity('sendKeySortField', e.target.value, setValiditySendKeySortField)}
+                  onBlur={e => _checkValidity('sendKeySortField', e.target.value, setValiditySendKeySortField)}
                 />
               </EuiFormRow>
               <EuiSpacer size="s" />
@@ -558,9 +566,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
                   name="sendKeyPageSize"
                   isInvalid={!isSendKeyPageSizeValid}
                   compressed={true}
-                  value={sendKeyPageSize}
+                  defaultValue={sendKeyPageSize}
                   placeholder="_limit"
-                  onChange={e => _checkValidity('sendKeyPageSize', e.target.value, setValiditySendKeyPageSize)}
+                  onBlur={e => _checkValidity('sendKeyPageSize', e.target.value, setValiditySendKeyPageSize)}
                 />
               </EuiFormRow>
               <EuiSpacer size="s" />
@@ -575,9 +583,9 @@ export function OptionsComponent({ setValue, setValidity, stateParams }) {
                   name="sendKeyOffset"
                   isInvalid={!isSendKeyOffsetValid}
                   compressed={true}
-                  value={sendKeyOffset}
+                  defaultValue={sendKeyOffset}
                   placeholder="_offset"
-                  onChange={e => _checkValidity('sendKeyOffset', e.target.value, setValiditySendKeyOffset)}
+                  onBlur={e => _checkValidity('sendKeyOffset', e.target.value, setValiditySendKeyOffset)}
                 />
               </EuiFormRow>
             </EuiForm>
