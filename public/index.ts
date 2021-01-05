@@ -18,12 +18,12 @@
  */
 
 import { PluginInitializerContext } from 'kibana/public';
-import { KbnBstTblPlugin } from './plugin';
+import { KbnExtTblPlugin } from './plugin';
 
 // This exports static code and TypeScript types,
 // as well as, Kibana Platform `plugin()` initializer.
 export function plugin(context: PluginInitializerContext) {
-  return new KbnBstTblPlugin(context);
+  return new KbnExtTblPlugin(context);
 }
 
-export { KbnBstTblPluginSetup, KbnBstTblPluginStart } from './types';
+export { KbnExtTblPluginSetup, KbnExtTblPluginStart } from './types';

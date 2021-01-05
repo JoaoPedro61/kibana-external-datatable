@@ -20,8 +20,8 @@
 import { i18n } from '@kbn/i18n';
 import { CoreSetup, CoreStart, Plugin, PluginInitializerContext } from '../../../src/core/public';
 import {
-  KbnBstTblPluginSetup,
-  KbnBstTblPluginStart,
+  KbnExtTblPluginSetup,
+  KbnExtTblPluginStart,
   AppPluginStartDependencies,
 } from './types';
 import { PLUGIN_NAME, PLUGIN_ID } from '../common';
@@ -31,15 +31,15 @@ import { setDataService } from './services';
 import { renderVis } from './application';
 
 
-export class KbnBstTblPlugin implements Plugin<KbnBstTblPluginSetup, KbnBstTblPluginStart> {
+export class KbnExtTblPlugin implements Plugin<KbnExtTblPluginSetup, KbnExtTblPluginStart> {
 
   constructor(private readonly initializerContext: PluginInitializerContext) { }
 
-  public setup(core: CoreSetup, { data, expressions, visualizations }: AppPluginStartDependencies): KbnBstTblPluginSetup {
+  public setup(core: CoreSetup, { data, expressions, visualizations }: AppPluginStartDependencies): KbnExtTblPluginSetup {
     renderVis(PLUGIN_ID, PLUGIN_NAME, { data, expressions, visualizations });
     return {
       getGreeting() {
-        return i18n.translate('kbnBstTbl.greetingText', {
+        return i18n.translate('KbnExtTbl.greetingText', {
           defaultMessage: 'Hello from {name}!',
           values: {
             name: PLUGIN_NAME,
@@ -49,7 +49,7 @@ export class KbnBstTblPlugin implements Plugin<KbnBstTblPluginSetup, KbnBstTblPl
     };
   }
 
-  public start(core: CoreStart, { data }: AppPluginStartDependencies): KbnBstTblPluginStart {
+  public start(core: CoreStart, { data }: AppPluginStartDependencies): KbnExtTblPluginStart {
     setDataService(data);
     return {};
   }

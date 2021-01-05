@@ -29,7 +29,7 @@ import { DataPublicPluginStart, AggGroupNames } from '../../../../src/plugins/da
 
 
 
-export interface KbnBstTblPluginVisualizationDeps {
+export interface KbnExtTblPluginVisualizationDeps {
   [x: string]: any;
   expressions: ExpressionsStart;
   data: DataPublicPluginStart;
@@ -80,7 +80,7 @@ export const DEFAULT_VIS_CONFIG = {
 };
 
 
-export function renderVis(id: string, name: string, deps: KbnBstTblPluginVisualizationDeps): void {
+export function renderVis(id: string, name: string, deps: KbnExtTblPluginVisualizationDeps): void {
   const _fac = () => ({
     name,
     type: 'render',

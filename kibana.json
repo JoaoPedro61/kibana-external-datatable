@@ -1,5 +1,5 @@
 {
-  "id": "kbn-bst-tbl",
+  "id": "kibana-external-datatable",
   "version": "kibana",
   "server": true,
   "ui": true,

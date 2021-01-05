@@ -31500,16 +31500,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.plugin = plugin;
-Object.defineProperty(exports, "KbnBstTblPluginSetup", {
+Object.defineProperty(exports, "KbnExtTblPluginSetup", {
   enumerable: true,
   get: function () {
-    return _types.KbnBstTblPluginSetup;
+    return _types.KbnExtTblPluginSetup;
   }
 });
-Object.defineProperty(exports, "KbnBstTblPluginStart", {
+Object.defineProperty(exports, "KbnExtTblPluginStart", {
   enumerable: true,
   get: function () {
-    return _types.KbnBstTblPluginStart;
+    return _types.KbnExtTblPluginStart;
   }
 });
 
@@ -31522,7 +31522,7 @@ var _types = __webpack_require__(/*! ./types */ "./public/types.ts");
 // This exports static code and TypeScript types,
 // as well as, Kibana Platform `plugin()` initializer.
 function plugin(context) {
-  return new _plugin.KbnBstTblPlugin(context);
+  return new _plugin.KbnExtTblPlugin(context);
 }
 
 /***/ }),
@@ -31540,7 +31540,7 @@ function plugin(context) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.KbnBstTblPlugin = void 0;
+exports.KbnExtTblPlugin = void 0;
 
 var _i18n = __webpack_require__(/*! @kbn/i18n */ "@kbn/i18n");
 
@@ -31568,7 +31568,7 @@ var _application = __webpack_require__(/*! ./application */ "./public/applicatio
  * specific language governing permissions and limitations
  * under the License.
  */
-class KbnBstTblPlugin {
+class KbnExtTblPlugin {
   constructor(initializerContext) {
     this.initializerContext = initializerContext;
   }
@@ -31585,7 +31585,7 @@ class KbnBstTblPlugin {
     });
     return {
       getGreeting() {
-        return _i18n.i18n.translate('kbnBstTbl.greetingText', {
+        return _i18n.i18n.translate('KbnExtTbl.greetingText', {
           defaultMessage: 'Hello from {name}!',
           values: {
             name: _common.PLUGIN_NAME
@@ -31607,7 +31607,7 @@ class KbnBstTblPlugin {
 
 }
 
-exports.KbnBstTblPlugin = KbnBstTblPlugin;
+exports.KbnExtTblPlugin = KbnExtTblPlugin;
 
 /***/ }),
 

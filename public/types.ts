@@ -21,11 +21,11 @@ import { ExpressionsStart } from '../../../src/plugins/expressions/public';
 import { VisualizationsSetup } from '../../../src/plugins/visualizations/public';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 
-export interface KbnBstTblPluginSetup {
+export interface KbnExtTblPluginSetup {
   getGreeting: () => string;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface KbnBstTblPluginStart {}
+export interface KbnExtTblPluginStart {}
 
 export interface AppPluginStartDependencies {
   expressions: ExpressionsStart;
